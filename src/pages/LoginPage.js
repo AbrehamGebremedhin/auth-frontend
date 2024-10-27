@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../utils/authService';
-import { useAuth } from '../utils/AuthContext';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const { setIsAuthenticated } = useAuth();
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
@@ -15,13 +12,24 @@ const LoginPage = () => {
         setError(null);
 
         try {
-            await loginUser({ email, password });
-            setIsAuthenticated(true);
-            navigate('/'); // Redirect to the home page
+            const response = await fetch('https://auth-backend-d9yx.onrender.com/api/v1/auth/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (response.ok) {
+                navigate('/');
+            } else {
+                const data = await response.json();
+                setError(data.message);
+            }
         } catch (err) {
-            setError('Invalid email or password');
+            setError('An error occurred. Please try again later.');
         }
-    };
+    }
 
     return (
         <div className="container mx-auto p-4">

@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../utils/authService';
-import { useAuth } from '../utils/AuthContext';
 
 const RegisterPage = () => {
     const [username, setUsername] = useState('');
@@ -9,7 +7,7 @@ const RegisterPage = () => {
     const [password, setPassword] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [error, setError] = useState(null);
-    const { setIsAuthenticated } = useAuth();
+
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
@@ -17,13 +15,24 @@ const RegisterPage = () => {
         setError(null);
 
         try {
-            await registerUser({ username, email, password, phonenumber: phoneNumber });
-            setIsAuthenticated(true);
-            navigate('/'); // Redirect to the home page
+            const response = await fetch('https://auth-backend-d9yx.onrender.com/api/v1/auth/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, password, phoneNumber }),
+            });
+
+            if (response.ok) {
+                navigate('/login');
+            } else {
+                const data = await response.json();
+                setError(data.message);
+            }
         } catch (err) {
-            setError('Error registering user, please try again.');
+            setError('An error occurred. Please try again later.');
         }
-    };
+    }
 
     return (
         <div className="container mx-auto p-4">

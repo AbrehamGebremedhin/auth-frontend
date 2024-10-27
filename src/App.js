@@ -1,26 +1,29 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './utils/AuthContext';
-import PrivateRoute from './utils/privateRoute';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
 const App = () => {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries:{
+        refetchInterval: 20000,
+        refetchOnWindowFocus: false
+      }
+    }
+  });
     return (
-        <AuthProvider>
+      <QueryClientProvider client={client}>
             <Router>
                 <Routes>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
-
-                    {/* Protected Routes */}
-                    <Route element={<PrivateRoute />}>
-                        <Route path="/" element={<HomePage />} />
-                    </Route>
+                    <Route path="/" element={<HomePage />} />
                 </Routes>
             </Router>
-        </AuthProvider>
+        </QueryClientProvider>
     );
 };
 

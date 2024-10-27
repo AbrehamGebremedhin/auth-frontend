@@ -1,50 +1,69 @@
 import React, { useEffect, useState } from 'react';
-import { getCurrentUser, getUserSessions, deleteSession, deleteAllSessions } from '../utils/authService';
-import { useAuth } from '../utils/AuthContext';
+import { getCookieValue } from '../utils/getCookieValue';
 
 const HomePage = () => {
-    const { user, setUser, setIsAuthenticated } = useAuth();
+    const [user, setUser] = useState(null);
     const [sessions, setSessions] = useState([]);
 
-    // Fetch user profile and sessions on load
     useEffect(() => {
-        const fetchProfileAndSessions = async () => {
-            try {
-                const userProfile = await getCurrentUser();
-                setUser(userProfile.data.data);
-                console.log(userProfile.data.data);
-
-                const sessionsResponse = await getUserSessions();
-                setSessions(sessionsResponse.data.data);
-                console.log(sessionsResponse.data.data);
-            } catch (error) {
-                console.error('Error fetching profile and sessions:', error);
+        // Fetch user profile
+        fetch('https://auth-backend-d9yx.onrender.com/api/v1/auth/profile/', {
+            headers: {
+                Authorization: `Bearer ${getCookieValue("accessToken")}`,
             }
+        })
+            .then((res) => res.json())
+            .then((data) => setUser(data.data));
+
+        // Fetch active sessions
+        fetch('/api/user/sessions', {
+            headers: {
+                Authorization: `Bearer ${getCookieValue("accessToken")}`,
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => setSessions(data.data));
+    }, []);
+
+    const handleDeleteSession = (sessionId) => {
+        fetch(`https://auth-backend-d9yx.onrender.com/api/v1/auth/sessions/${sessionId}`, { 
+            headers: {
+                Authorization: `Bearer ${getCookieValue("accessToken")}`,
+            },
+            method: 'DELETE' 
+        })
+            .then(() => {
+                setSessions((sessions) => sessions.filter((session) => session._id !== sessionId));
+            });
+    };
+
+    const handleLogoutAll = () => {
+        fetch('https://auth-backend-d9yx.onrender.com/api/v1/auth/sessions/', { 
+            headers: {
+                Authorization: `Bearer ${getCookieValue("accessToken")}`,
+            },
+            method: 'POST' 
+        })
+            .then(() => setSessions([]));
+    }
+
+    useEffect(() => {
+        const refreshAccessToken = () => {
+            fetch('https://auth-backend-d9yx.onrender.com/api/v1/auth/refresh', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${getCookieValue("refreshToken")}`,
+                }
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                });
         };
 
-        fetchProfileAndSessions();
-    }, [setUser]);
+        const intervalId = setInterval(refreshAccessToken, 10 * 60 * 1000); // 10 minutes
 
-    // Handle logging out of a specific session
-    const handleDeleteSession = async (sessionId) => {
-        try {
-            await deleteSession(sessionId); // Call deleteSession service function
-            setSessions(sessions.filter(session => session._id !== sessionId));
-        } catch (error) {
-            console.error('Error deleting session:', error);
-        }
-    };
-
-    // Handle logging out of all sessions
-    const handleLogoutAll = async () => {
-        try {
-            await deleteAllSessions(); // Call deleteAllSessions service function
-            setIsAuthenticated(false);
-            // Optionally, redirect the user to the login page
-        } catch (error) {
-            console.error('Error logging out of all sessions:', error);
-        }
-    };
+        return () => clearInterval(intervalId);
+    }, []);
 
     return (
         <div className="container mx-auto p-4">
