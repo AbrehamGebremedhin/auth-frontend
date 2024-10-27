@@ -11,10 +11,10 @@ const HomePage = () => {
         const fetchProfileAndSessions = async () => {
             try {
                 const userProfile = await getCurrentUser();
-                setUser(userProfile.data);
+                setUser(userProfile.data.data);
 
                 const sessionsResponse = await getUserSessions();
-                setSessions(sessionsResponse.data);
+                setSessions(sessionsResponse.data.data);
             } catch (error) {
                 console.error('Error fetching profile and sessions:', error);
             }
@@ -52,6 +52,7 @@ const HomePage = () => {
                 <h2 className="text-2xl font-semibold">Your Profile</h2>
                 <div className="bg-white p-4 rounded shadow-md mt-2">
                     <p><strong>Email:</strong> {user?.email}</p>
+                    <p><strong>Username:</strong> {user?.username}</p>
                     <p><strong>Phone Number:</strong> {user?.phonenumber}</p>
                     <p><strong>Created On:</strong> {new Date(user?.createdOn).toLocaleString()}</p>
                 </div>

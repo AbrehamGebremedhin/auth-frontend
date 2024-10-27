@@ -17,7 +17,7 @@ export const logoutUser = async () => {
 
 // Get current user info
 export const getCurrentUser = async () => {
-    return await api.get('/auth/who');
+    return await api.get('/auth/profile');
 };
 
 // Get active sessions

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create an Axios instance
 const api = axios.create({
-    baseURL: 'https://auth-backend-d9yx.onrender.com/api/v1', // Update with your backend base URL
+    baseURL: 'http://localhost:5000/api/v1', // Update with your backend base URL
     withCredentials: true // Include cookies with each request
 });
 
