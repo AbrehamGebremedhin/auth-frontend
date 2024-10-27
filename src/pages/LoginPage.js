@@ -21,7 +21,7 @@ const LoginPage = () => {
             });
 
             if (response.ok) {
-                navigate('/');
+                navigate('/home');
             } else {
                 const data = await response.json();
                 setError(data.message);
