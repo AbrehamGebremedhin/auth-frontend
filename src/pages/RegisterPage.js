@@ -74,6 +74,9 @@ const RegisterPage = () => {
                     Register
                 </button>
             </form>
+            <p className="mt-4">
+                You have an account? <a href="/login" className="text-blue-500 hover:underline">Log in</a>
+            </p>
         </div>
     );
 };
