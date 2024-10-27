@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie'; // Import js-cookie
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -18,9 +19,15 @@ const LoginPage = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ email, password }),
+                credentials: 'include', // This ensures that cookies are included in the request
             });
 
             if (response.ok) {
+                // If you want to manually manage the cookie in React (optional):
+                const data = await response.json();
+                Cookies.set('accessToken', data.accessToken, { expires: 1/144, secure: true }); // 10 minutes in days
+                Cookies.set('refreshToken', data.refreshToken, { expires: 7, secure: true });
+
                 navigate('/home');
             } else {
                 const data = await response.json();
