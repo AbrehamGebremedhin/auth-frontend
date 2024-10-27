@@ -12,9 +12,11 @@ const HomePage = () => {
             try {
                 const userProfile = await getCurrentUser();
                 setUser(userProfile.data.data);
+                console.log(userProfile.data.data);
 
                 const sessionsResponse = await getUserSessions();
                 setSessions(sessionsResponse.data.data);
+                console.log(sessionsResponse.data.data);
             } catch (error) {
                 console.error('Error fetching profile and sessions:', error);
             }
