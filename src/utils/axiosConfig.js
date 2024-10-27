@@ -17,7 +17,7 @@ api.interceptors.response.use(
 
             // Try refreshing the token
             try {
-                await axios.post('/auth/refresh', {}, { withCredentials: true });
+                await axios.post('https://auth-backend-d9yx.onrender.com/api/v1/auth/refresh', {}, { withCredentials: true });
                 return api(originalRequest); // Retry the original request with the new access token
             } catch (refreshError) {
                 // Handle refresh token failure (redirect to login or show an error)
