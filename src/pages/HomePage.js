@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getCurrentUser, getUserSessions, deleteSession, deleteAllSessions } from '../utils/authService';
+import api from '../utils/axiosConfig';
 import { useAuth } from '../utils/AuthContext';
 
 const HomePage = () => {
@@ -10,11 +10,11 @@ const HomePage = () => {
     useEffect(() => {
         const fetchProfileAndSessions = async () => {
             try {
-                const userProfile = await getCurrentUser();
+                const userProfile = await api.get('/auth/profile');
                 setUser(userProfile.data.data);
                 console.log(userProfile.data.data);
 
-                const sessionsResponse = await getUserSessions();
+                const sessionsResponse = await api.get('/auth/sessions');
                 setSessions(sessionsResponse.data.data);
                 console.log(sessionsResponse.data.data);
             } catch (error) {
@@ -28,7 +28,7 @@ const HomePage = () => {
     // Handle logging out of a specific session
     const handleDeleteSession = async (sessionId) => {
         try {
-            await deleteSession(sessionId); // Call deleteSession service function
+            await api.delete(`/auth/sessions/${sessionId}`); // Call deleteSession service function
             setSessions(sessions.filter(session => session._id !== sessionId));
         } catch (error) {
             console.error('Error deleting session:', error);
@@ -38,7 +38,7 @@ const HomePage = () => {
     // Handle logging out of all sessions
     const handleLogoutAll = async () => {
         try {
-            await deleteAllSessions(); // Call deleteAllSessions service function
+            await api.delete('/auth/sessions'); // Call deleteAllSessions service function
             setIsAuthenticated(false);
             // Optionally, redirect the user to the login page
         } catch (error) {
